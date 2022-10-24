@@ -111,22 +111,22 @@ def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
     # util.raiseNotDefined()
-    queue = []
-    queue.append((problem.getStartState(), []))
+    queue = util.Queue()
+    queue.push((problem.getStartState(), []))
     return bfs_search(problem, queue, [])
 
 def bfs_search(problem, queue, visited):
     possible_successors = []
-    queue.append((problem.getStartState(), possible_successors))
-    while(len(queue) > 0):
-        current_pos, path = queue.pop(0)
+    queue.push((problem.getStartState(), possible_successors))
+    while(not queue.isEmpty()):
+        current_pos, path = queue.pop()
         if current_pos not in visited:
             visited.append(current_pos)
             if problem.isGoalState(current_pos):
                 return path
             for successor in problem.getSuccessors(current_pos):
                 possible_successors = path + [successor[1]]
-                queue.append((successor[0], possible_successors))
+                queue.push((successor[0], possible_successors))
     return []
 
 
