@@ -112,7 +112,7 @@ def breadthFirstSearch(problem):
     "*** YOUR CODE HERE ***"
     # util.raiseNotDefined()
     queue = util.Queue()
-    queue.push((problem.getStartState(), []))
+    # queue.push((problem.getStartState(), []))
     return bfs_search(problem, queue, [])
 
 def bfs_search(problem, queue, visited):
@@ -133,7 +133,27 @@ def bfs_search(problem, queue, visited):
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    # util.raiseNotDefined()
+    queue = util.PriorityQueue()
+    # print problem.getCostOfActions(["West", "South"])
+    return ucs_search(problem, queue, [])
+
+
+def ucs_search(problem, queue, visited):
+    possible_successors = []
+    queue.push((problem.getStartState(), possible_successors), 0)
+    while (not queue.isEmpty()):
+        current_pos, path = queue.pop()
+        if current_pos not in visited:
+            visited.append(current_pos)
+            if problem.isGoalState(current_pos):
+                return path
+            for successor in problem.getSuccessors(current_pos):
+                possible_successors = path + [successor[1]]
+                cost = problem.getCostOfActions(possible_successors)
+                # print cost
+                queue.push((successor[0], possible_successors), cost)
+    return []
 
 def nullHeuristic(state, problem=None):
     """
