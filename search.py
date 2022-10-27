@@ -88,7 +88,10 @@ def depthFirstSearch(problem):
     """
     "*** YOUR CODE HERE ***"
     # util.raiseNotDefined()
-    return dfs_search(problem, [], problem.getStartState(), [])
+
+    directions = dfs_search(problem, [], problem.getStartState(), [])
+    # print ("Directions", len(directions))
+    return directions
 
 def  dfs_search(problem, visited, current_state, directions):
     from game import Directions
@@ -136,10 +139,13 @@ def uniformCostSearch(problem):
     # util.raiseNotDefined()
     queue = util.PriorityQueue()
     # print problem.getCostOfActions(["West", "South"])
-    return ucs_search(problem, queue, [])
+    return ucs_search(problem, queue, [], None, False)
 
+def astar_search(problem, queue, visited, heuristic):
+    return ucs_search(problem, queue, visited ,heuristic, applyHeuristic=True)
 
-def ucs_search(problem, queue, visited):
+def ucs_search(problem, queue, visited, heuristic ,applyHeuristic = False):
+    # import searchAgents as sa
     possible_successors = []
     queue.push((problem.getStartState(), possible_successors), 0)
     while (not queue.isEmpty()):
@@ -151,6 +157,9 @@ def ucs_search(problem, queue, visited):
             for successor in problem.getSuccessors(current_pos):
                 possible_successors = path + [successor[1]]
                 cost = problem.getCostOfActions(possible_successors)
+                if(applyHeuristic):
+                    # print sa.manhattanHeuristic(current_pos, problem)
+                    cost += heuristic(successor[0], problem)
                 # print cost
                 queue.push((successor[0], possible_successors), cost)
     return []
@@ -165,7 +174,8 @@ def nullHeuristic(state, problem=None):
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    return astar_search(problem, util.PriorityQueue(), [], heuristic)
+    # util.raiseNotDefined()
 
 
 # Abbreviations
