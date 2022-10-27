@@ -94,12 +94,45 @@ def depthFirstSearch(problem):
 
     return dfsFunc(pathTaken, [], problem)
 
+def dfs_search_with_stack(problem):
+    visited = []
+    stack = util.Stack()
+    stack.push((problem.getStartState(), []))
+
+    while(not stack.isEmpty()):
+        state, directions = stack.pop()
+        if (not state in visited):
+            visited.append(state)
+            if problem.isGoalState(state):
+                return directions
+            # directions.append(state[1])
+            for n_state in problem.getSuccessors(state):
+                nextInstruction = directions + [n_state[1]]
+                stack.push((n_state[0], nextInstruction))
+    return []
+
+def  dfs_search_recursion(problem, visited, current_state, directions):
+    from game import Directions
+    for state in problem.getSuccessors(current_state):
+        new_pos = state[0]
+        direction = state[1]
+        if problem.isGoalState(current_state):
+            return directions
+        if new_pos in visited:
+            continue
+        # visited.append(new_pos)
+        visited.append(new_pos)
+        directions.append(direction)
+        dfs_search_recursion(problem, visited, new_pos, directions);
+        directions.append(Directions.REVERSE[direction])
+        visited.remove(new_pos)
+    return directions
 
 def dfsFunc(pathTaken, visited, problem):
     currentNode = pathTaken.pop()
     if problem.isGoalState(currentNode[0]):
-        print(pathTaken)
-        print(len(currentNode[1]))
+        # print(pathTaken)
+        # print(len(currentNode[1]))
         return currentNode[1]
     elif visited.count(currentNode[0]) == 0:
         visited.append(currentNode[0])
