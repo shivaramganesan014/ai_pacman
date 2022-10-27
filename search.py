@@ -89,26 +89,24 @@ def depthFirstSearch(problem):
     "*** YOUR CODE HERE ***"
     # util.raiseNotDefined()
 
-    directions = dfs_search(problem, [], problem.getStartState(), [])
-    # print ("Directions", len(directions))
-    return directions
+    pathTaken = []
+    pathTaken.append((problem.getStartState(), []))
 
-def  dfs_search(problem, visited, current_state, directions):
-    from game import Directions
-    for state in problem.getSuccessors(current_state):
-        new_pos = state[0]
-        direction = state[1]
-        if problem.isGoalState(current_state):
-            return directions
-        if new_pos in visited:
-            continue
-        # visited.append(new_pos)
-        visited.append(new_pos)
-        directions.append(direction)
-        dfs_search(problem, visited, new_pos, directions);
-        directions.append(Directions.REVERSE[direction])
-        visited.remove(new_pos)
-    return directions
+    return dfsFunc(pathTaken, [], problem)
+
+
+def dfsFunc(pathTaken, visited, problem):
+    currentNode = pathTaken.pop()
+    if problem.isGoalState(currentNode[0]):
+        print(pathTaken)
+        print(len(currentNode[1]))
+        return currentNode[1]
+    elif visited.count(currentNode[0]) == 0:
+        visited.append(currentNode[0])
+        for moves in problem.getSuccessors(currentNode[0]):
+            if visited.count(moves[0]) == 0:
+                pathTaken.append((moves[0], currentNode[1] + [moves[1]]))
+        return dfsFunc(pathTaken, visited, problem)
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
