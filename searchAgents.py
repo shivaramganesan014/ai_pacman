@@ -290,6 +290,7 @@ class CornersProblem(search.SearchProblem):
         "*** YOUR CODE HERE ***"
         self.visited_corners = []
         self.goals = 4 # 4 corners
+        self.startingGameState = startingGameState
 
     def getStartState(self):
         """
@@ -312,6 +313,7 @@ class CornersProblem(search.SearchProblem):
             visited_c.append(state[0]) #appending only the corners if its not already visited
             # self.visited_corners.append(state)
             # return self.goals == 0
+        self.visited_corners = visited_c # to track the visited corners for returning heuristic
         return len(visited_c) == 4 # all 4 corners are visited.
         # util.raiseNotDefined()
 
@@ -383,9 +385,40 @@ def cornersHeuristic(state, problem):
     """
     corners = problem.corners # These are the corner coordinates
     walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
-
     "*** YOUR CODE HERE ***"
-    return 0 # Default to trivial solution
+    dist = 0
+    count = 0
+    # corners_dist = {}
+    # for c in corners:
+    #     corners_dist[c] = get_min_dist_bet_corners(c, corners, problem.visited_corners)
+    dist_h = 0
+    all_dist = 0
+    # print problem.visited_corners
+    for c in corners:
+        if c not in state[1]:
+            count += 1
+            # new_distance = testfn(state[0], c) + corners_dist[c]
+            cost = testfn(state[0], c, problem.startingGameState)
+            # all_dist += cost
+            dist_h = max(dist_h, cost)
+    return dist_h
+    # return all_dist
+    # return 0 # Default to trivial solution
+
+def get_min_dist_bet_corners(c, corners, visited_corners):
+    m_dist = 10000
+    for corner in corners:
+        if corner == c or corner in visited_corners:
+            continue
+        m_dist = min(m_dist, abs(c[0] - corner[0]) + abs(c[1] - corner[1]))
+    return m_dist
+
+def testfn(xy1 ,xy2, gameState):
+    # e_dist = ((xy1[0] - xy2[0]) ** 2 + (xy1[1] - xy2[1]) ** 2) ** 0.5
+    # m_dist = abs(xy1[0] - xy2[0]) + abs(xy1[1] - xy2[1])
+    # chebyshev_dist = max(xy2[0] - xy1[0], xy2[1] - xy1[0])
+    # return m_dist / 0.1
+    return mazeDistance(xy1, xy2 ,gameState)
 
 class AStarCornersAgent(SearchAgent):
     "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"

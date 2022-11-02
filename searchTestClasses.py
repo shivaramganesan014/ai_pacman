@@ -702,6 +702,9 @@ class CornerHeuristicSanity(testClasses.TestCase):
         for succ in succs:
             h1 = searchAgents.cornersHeuristic(succ[0], problem)
             if h0 - h1 > 1:
+                print "***************" + str(h1) + "****" +  str(h0)
+                print succ
+                print game_state
                 grades.addMessage('FAIL: inconsistent heuristic')
                 return False
         heuristic_cost = searchAgents.cornersHeuristic(start_state, problem)
@@ -724,6 +727,7 @@ class CornerHeuristicSanity(testClasses.TestCase):
             h1 = heuristics[i+1]
             # cornerConsistencyB
             if h0 - h1 > 1:
+                print "***************" + h1, h0
                 grades.addMessage('FAIL: inconsistent heuristic')
                 return False
             # cornerPosH
@@ -784,6 +788,7 @@ class CornerHeuristicPacman(testClasses.TestCase):
         print "path length:", len(path)
         cost = problem.getCostOfActions(path)
         if cost > true_cost:
+            print "***********" + cost, true_cost
             grades.addMessage('FAIL: Inconsistent heuristic')
             return False
         expanded = problem._expanded
