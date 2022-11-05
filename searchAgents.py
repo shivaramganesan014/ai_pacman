@@ -288,9 +288,9 @@ class CornersProblem(search.SearchProblem):
         # Please add any code here which you would like to use
         # in initializing the problem
         "*** YOUR CODE HERE ***"
-        self.visited_corners = []
-        self.goals = 4 # 4 corners
-        self.startingGameState = startingGameState
+        # self.visited_corners = []
+        # self.goals = 4 # 4 corners
+        self.startingGameState = startingGameState #used in calculating the maze distance in corners heuristic
 
     def getStartState(self):
         """
@@ -299,6 +299,7 @@ class CornersProblem(search.SearchProblem):
         """
         "*** YOUR CODE HERE ***"
         return (self.startingPosition, []) #took reference from internet. Given this we were able to figure out others
+        # the second item in the tuple is to track the visited corners of the given state.
 
         # util.raiseNotDefined()
 
@@ -311,10 +312,8 @@ class CornersProblem(search.SearchProblem):
         if state[0] in self.corners and state[0] not in state[1]:
             self.goals = self.goals - 1
             visited_c.append(state[0]) #appending only the corners if its not already visited
-            # self.visited_corners.append(state)
-            # return self.goals == 0
         self.visited_corners = visited_c # to track the visited corners for returning heuristic
-        return len(visited_c) == 4 # all 4 corners are visited.
+        return len(visited_c) == 4 # all 4 corners are visited. hence goal is reached
         # util.raiseNotDefined()
 
     def getSuccessors(self, state):
@@ -345,13 +344,11 @@ class CornersProblem(search.SearchProblem):
             nextx, nexty = int(x+dx), int (y+dy)
             hitsWall = self.walls[nextx][nexty]
             if not hitsWall:
-                # visited_c.append((nextx, nexty))
                 corners_visited_d = visited_c[:]
-
                 if (nextx, nexty) in self.corners and (nextx, nexty) not in corners_visited_d:
-                    corners_visited_d.append((nextx, nexty))
+                    corners_visited_d.append((nextx, nexty)) # adding the corner to visited corners list for the next state
                 next_state = ((nextx, nexty), corners_visited_d)
-                successors.append((next_state, action, 1))
+                successors.append((next_state, action, 1))#each possible actions from teh current state are added
 
         self._expanded += 1 # DO NOT CHANGE
         return successors
@@ -386,39 +383,34 @@ def cornersHeuristic(state, problem):
     corners = problem.corners # These are the corner coordinates
     walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
     "*** YOUR CODE HERE ***"
-    dist = 0
-    count = 0
-    # corners_dist = {}
-    # for c in corners:
-    #     corners_dist[c] = get_min_dist_bet_corners(c, corners, problem.visited_corners)
     dist_h = 0
-    all_dist = 0
-    # print problem.visited_corners
     for c in corners:
         if c not in state[1]:
-            count += 1
-            # new_distance = testfn(state[0], c) + corners_dist[c]
-            cost = testfn(state[0], c, problem.startingGameState)
-            # all_dist += cost
-            dist_h = max(dist_h, cost)
+            cost = mazeDistance(state[0], c, problem.startingGameState)
+            dist_h = max(cost, dist_h)
+            # dist_h = min(manhatten_dist(state[0], c), dist_h)
+            # dist_h = max(manhatten_dist(state[0], c), dist_h)
+            # dist_h = max(euclidean_dist(state[0], c), dist_h)
+            # dist_h = min(euclidean_dist(state[0], c), dist_h)
     return dist_h
-    # return all_dist
-    # return 0 # Default to trivial solution
 
 def get_min_dist_bet_corners(c, corners, visited_corners):
+    # this returns the min distance between the given state c and all the corners
     m_dist = 10000
     for corner in corners:
         if corner == c or corner in visited_corners:
             continue
         m_dist = min(m_dist, abs(c[0] - corner[0]) + abs(c[1] - corner[1]))
     return m_dist
-
-def testfn(xy1 ,xy2, gameState):
-    # e_dist = ((xy1[0] - xy2[0]) ** 2 + (xy1[1] - xy2[1]) ** 2) ** 0.5
-    # m_dist = abs(xy1[0] - xy2[0]) + abs(xy1[1] - xy2[1])
-    # chebyshev_dist = max(xy2[0] - xy1[0], xy2[1] - xy1[0])
-    # return m_dist / 0.1
-    return mazeDistance(xy1, xy2 ,gameState)
+def manhatten_dist(xy1, xy2):
+    #returns manhattan distance between 2 coordinates
+    return abs(xy1[0] - xy2[0]) + abs(xy1[1] - xy2[1])
+def euclidean_dist(xy1, xy2):
+    #returns euclidean distance between 2 coordinates
+    return ((xy1[0] - xy2[0]) ** 2 + (xy1[1] - xy2[1]) ** 2) ** 0.5
+def chbyshev_dist(xy1, xy2):
+    #returns chebyshev distance between 2 coordinates
+    return max(xy2[0] - xy1[0], xy2[1] - xy1[0])
 
 class AStarCornersAgent(SearchAgent):
     "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"
