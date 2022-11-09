@@ -504,7 +504,38 @@ def foodHeuristic(state, problem):
     """
     position, foodGrid = state
     "*** YOUR CODE HERE ***"
+    return getH(position, foodGrid.asList())
+    # return 0
+
+def getH(position, foodGrid):
+    max_dist = 0
+    sum = 0
+    count = 0
+    min_dist = 100000
+    for i in range(0, len(foodGrid)):
+        for j in range(0, len(foodGrid[i])):
+            if foodGrid[i][j] == True:
+                dist = getDistance(position, (i, j), "manhattan")
+                sum+=dist
+                count+=1
+                max_dist = max(max_dist, dist)
+                min_dist = min(min_dist, dist)
+    # print heuristic
+    if count == 0:
+        return 0
+    # return sum/count
+    return max_dist + min_dist
+    # return max_dist
+
+def getDistance(xy1, xy2, type):
+    if type == 'manhattan':
+        return manhatten_dist(xy1, xy2)
+    if type == 'euclidean':
+        return euclidean_dist(xy1, xy2)
+    if type == 'chebyshev':
+        return chbyshev_dist(xy1, xy2)
     return 0
+
 
 class ClosestDotSearchAgent(SearchAgent):
     "Search for all food using a sequence of searches"
