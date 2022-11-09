@@ -504,36 +504,48 @@ def foodHeuristic(state, problem):
     """
     position, foodGrid = state
     "*** YOUR CODE HERE ***"
-    return getH(position, foodGrid.asList())
+    return getH(position, foodGrid.asList(), problem)
     # return 0
 
-def getH(position, foodGrid):
+def getH(position, foodGrid, problem):
     max_dist = 0
     sum = 0
     count = 0
     min_dist = 100000
+    max_pos = position
+    min_pos = position
     for i in range(0, len(foodGrid)):
-        for j in range(0, len(foodGrid[i])):
-            if foodGrid[i][j] == True:
-                dist = getDistance(position, (i, j), "manhattan")
-                sum+=dist
-                count+=1
-                max_dist = max(max_dist, dist)
-                min_dist = min(min_dist, dist)
+        food_pos = foodGrid[i]
+        dist = getDistance(position, food_pos, "maze", problem)
+        sum+=dist
+        count+=1
+        if(dist > max_dist):
+            max_pos = food_pos
+        if(dist < min_dist):
+            min_pos = food_pos
+        max_dist = max(max_dist, dist)
+        min_dist = min(min_dist, dist)
     # print heuristic
     if count == 0:
         return 0
+    # return min_dist
     # return sum/count
-    return max_dist + min_dist
-    # return max_dist
+    # return getDistance(position, min_pos, "manhattan", problem) + getDistance(min_pos, max_pos, "manhattan", problem)
+    # return getDistance(position, min_pos, "maze", problem) + getDistance(min_pos, max_pos, "maze", problem)
+    # return max_dist + min_dist
+    return max_dist
 
-def getDistance(xy1, xy2, type):
+
+
+def getDistance(xy1, xy2, type, problem):
     if type == 'manhattan':
         return manhatten_dist(xy1, xy2)
     if type == 'euclidean':
         return euclidean_dist(xy1, xy2)
     if type == 'chebyshev':
         return chbyshev_dist(xy1, xy2)
+    if type == 'maze':
+        return mazeDistance(xy1, xy2, problem.startingGameState)
     return 0
 
 
