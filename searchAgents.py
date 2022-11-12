@@ -504,10 +504,9 @@ def foodHeuristic(state, problem):
     """
     position, foodGrid = state
     "*** YOUR CODE HERE ***"
-    return getH(position, foodGrid.asList(), problem)
-    # return 0
+    return getFoodHeuristic(position, foodGrid.asList(), problem)
 
-def getH(position, foodGrid, problem):
+def getFoodHeuristic(position, foodGrid, problem):
     max_dist = 0
     sum = 0
     count = 0
@@ -516,28 +515,33 @@ def getH(position, foodGrid, problem):
     min_pos = position
     for i in range(0, len(foodGrid)):
         food_pos = foodGrid[i]
-        dist = getDistance(position, food_pos, "maze", problem)
+        dist = getDistance(position, food_pos, "maze", problem) # returns the distance between the current pacman and the given food position.
         sum+=dist
         count+=1
         if(dist > max_dist):
-            max_pos = food_pos
+            max_pos = food_pos # food pos that is farthest from the current pacman coordinates
         if(dist < min_dist):
-            min_pos = food_pos
-        max_dist = max(max_dist, dist)
-        min_dist = min(min_dist, dist)
-    # print heuristic
+            min_pos = food_pos # food pos that is closest to the current pacman coordinates
+        max_dist = max(max_dist, dist) # max of the distance between pacman and food_pos
+        min_dist = min(min_dist, dist) # min of the distance between pacman and food_pos
     if count == 0:
         return 0
+    return max_dist
+
+    #other heuristics that we tried before returing the max distance between the pacman position and the food coordinates
     # return min_dist
     # return sum/count
-    # return getDistance(position, min_pos, "manhattan", problem) + getDistance(min_pos, max_pos, "manhattan", problem)
-    # return getDistance(position, min_pos, "maze", problem) + getDistance(min_pos, max_pos, "maze", problem)
     # return max_dist + min_dist
-    return max_dist
+    # return getDistance(position, min_pos, "manhattan", problem) + getDistance(min_pos, max_pos, "manhattan", problem)
+
+    # This following heuristic performs better than max(maze_distance)
+    # we got this idea from a stackoverflow and hence decided not use this.
+    # return getDistance(position, min_pos, "maze", problem) + getDistance(min_pos, max_pos, "maze", problem)
 
 
 
 def getDistance(xy1, xy2, type, problem):
+    # returns the different types of distance between 2 points
     if type == 'manhattan':
         return manhatten_dist(xy1, xy2)
     if type == 'euclidean':
@@ -546,7 +550,7 @@ def getDistance(xy1, xy2, type, problem):
         return chbyshev_dist(xy1, xy2)
     if type == 'maze':
         return mazeDistance(xy1, xy2, problem.startingGameState)
-    return 0
+    return 0 #default distance
 
 
 class ClosestDotSearchAgent(SearchAgent):
@@ -577,20 +581,21 @@ class ClosestDotSearchAgent(SearchAgent):
         walls = gameState.getWalls()
         problem = AnyFoodSearchProblem(gameState)
         "*** YOUR CODE HERE ***"
-        min_dist = 10000
+        # This method is a little slower since the maze distance (Which also uses bfs search) has to be calculated and again bfs search is done to the same point
+        # This can be optimized if the code of maze distance is allowed to be edited to return the path.
+        min_dist = 10000 # arbitary max value to compute the min distance
         min_pos = startPosition
+        # minimum distance between the pacman and the next food position is calculated.
+        # Once the min distance is calculated bfs search is used
         for food_pos in food.asList():
             dist = mazeDistance(startPosition, food_pos, gameState)
             if dist < min_dist:
                 min_pos = food_pos
             min_dist = min(dist, min_dist)
-
+        # bfs search to find the path to the closest food dot.
         prob = PositionSearchProblem(gameState, start=startPosition, goal=min_pos, warn=False, visualize=False)
         path = search.bfs(prob)
-        # print path
         return path
-        # return []
-        # util.raiseNotDefined()
 
 class AnyFoodSearchProblem(PositionSearchProblem):
     """
@@ -626,7 +631,7 @@ class AnyFoodSearchProblem(PositionSearchProblem):
         x,y = state
 
         "*** YOUR CODE HERE ***"
-        # util.raiseNotDefined()
+        # Goal state is the state when all the food dot is eaten by the pacman
         return len(self.food.asList()) == 0
 
 def mazeDistance(point1, point2, gameState):
